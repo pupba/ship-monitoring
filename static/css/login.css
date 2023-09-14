@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+body{
+    font-family: 'Black Han Sans', sans-serifs;
+}
+div.form-group{
+    border: 0;
+    outline: none;
+    font-size: 30px;
+    margin: 30px;
+    background: black;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+h1{
+    font-size: 20%;
+}
+#title,#username,#password{
+    border: 0;
+    outline: none;
+    font-size: 30px;
+    background: black;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+button{
+    font-family: 'Black Han Sans', sans-serifs;
+    border: 0;
+    outline: none;
+    font-size: 50px;
+    margin: 30px;
+    background: black;
+    color: white;
+    padding: 0px;
+    cursor: pointer;
+    border-radius: 10px;
+}

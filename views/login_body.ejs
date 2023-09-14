@@ -1,0 +1,20 @@
+<body>
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <form hx-post="/check" hx-target = "this">
+        <div class="form-group">
+            <h1 id="title">선박 관제 시스템</h1>
+        </div>
+        <div class="form-group">
+            <label for="username">ID : </label>
+            <input type="text" id="username" name="username" placeholder="아이디">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">PW : </label>
+            <input type="password" id="password" name="password" placeholder="비밀번호">
+        </div>
+        <div class="form-group">
+            <button type='submit'>로그인</button>
+        </div>
+    </form>
+</body>

@@ -1,0 +1,48 @@
+<body>
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <!--좌측-->
+    <table>
+        <thead>
+            <tr>
+                <th>수동제어 패널</th>
+            </tr>
+            <tr>
+                <td>대응 단계 : <%= ship.status %></td>
+            </tr>
+            <tr>
+                <td>AIS : <%= ship.ais %></td>
+            </tr>
+            <tr>
+                <td>SSAS : <%= ship.ssas %></td>ss
+            </tr>
+            <tr>
+                <td>경보 : <%= ship.speaker %></td>
+            </tr>
+            <tr>
+                <td>Elect Blow : <%= ship.eb %></td>
+            </tr>
+        </thead>
+    </table>
+    <div id="btn2">
+        <button>수동 신고</button><br>
+        <button>해양수산부</button><br>
+        <button>사고 기록 확인</button><br>
+    </div>
+    <table>
+        <thead>
+          <tr>
+            <th><a hx-post="/disconnect" class="back-btn">연결종료</a></th>
+            <div table-box>
+                <th>선박명 : <%= ship.ship_name %></th>
+                <th>연결상태 : <%= connect %></th>
+                <th>SOG : <%= ship.sog %>knt</th>
+                <th>COG : <%= ship.cog %>°</th>
+                <th>위치 : <%= ship.location %></th>
+            </div>
+          </tr>
+        </thead>
+    </table>
+    <div id="video-box">
+        <video></video>
+    </div>
+</body>
