@@ -60,7 +60,6 @@ module.exports = (app,connection,crypto,query) =>{
             if (err) {
                 console.error('쿼리오류',err);
                 return;
-                // DB의 해시 비밀번호
             }
             else {
                 const data = results;
@@ -73,16 +72,82 @@ module.exports = (app,connection,crypto,query) =>{
             }
         });
     });
-    /** 사고 기록확인 페이지 : 사고 기록확인 페이지 */
-    app.get("/log",(req,res)=>{res.render("accident",{
-        title:"사고기록 확인",
-        cssfiles:"accident",
-        data : [{time:"2023-03-18 10:22:13",name:"새누리1",loaction:"GANA",stage:"돌고래1단계",etc:"hello"},
-        {time:"2023-03-18 10:12:13",name:"새누리2",loaction:"KONGO",stage:"돌고래0단계",etc:"hello"},
-        {time:"2023-03-18 10:32:13",name:"새누리3",loaction:"Korea",stage:"돌고래2단계",etc:"hello"}]
-    })});
+    /** 신고기록 */
+    app.get("/accident-log",(req,res)=>{
+        const query = "SELECT * FROM accident_log";
+        connection.query(query,(err,results)=>{
+            if (err) {
+                console.error('쿼리오류',err);
+                return;
+            }
+            else {
+                const data = results;
+                res.render("accident",{
+                    title: "신고기록",
+                    cssfiles : "accident",
+                    data : data,
+                    formatDateTime
+                });     
+            }
+        });
+    });
     /** 뒤로가기 처리 */
     app.post("/disconnect",(req,res)=>{
        res.send('<script>alert("연결종료!"); window.location.href="/list";</script>');
     });
+    /** 사고기록 */
+    app.get("/event-log",(req,res)=>{
+        const query = "SELECT * FROM event_log";
+        connection.query(query,(err,results)=>{
+            if (err) {
+                console.error('쿼리오류',err);
+                return;
+            }
+            else {
+                const data = results;
+                res.render("event",{
+                    title: "사고기록",
+                    cssfiles : "event",
+                    data : data,
+                    formatDateTime
+                });     
+            }
+        });
+    });
+    /** 수동 신고 */
+    app.post("/report",(req,res)=>{
+        const data = req.body;
+        let stage = "";
+        if (data.stage == 0){
+            stage = "돌고래 0단계";
+        }
+        else if (data.stage == 1){
+            stage = "돌고래 1단계";
+        }
+        else{
+            stage = "돌고래 2단계";
+        }
+        const query1 = "INSERT INTO accident_log(datatime,ship_name,location,etc) VALUES ('"+formatDateTime(data.datetime)+"','"+data.shipN+"','"+data.location+"','"+"bording"+"')";
+        const query2 = "INSERT INTO event_log(datatime,ship_name,location,stage) VALUES ('"+formatDateTime(data.datetime)+"','"+data.shipN+"','"+data.location+"','"+stage+"')";
+        connection.query(query1,(err,results)=>{
+            if (err) {
+                console.error('쿼리오류',err);
+                return;
+            }
+        });
+        connection.query(query2,(err,results)=>{
+            if (err) {
+                console.error('쿼리오류',err);
+                return;
+            }
+            else {
+                res.send('<script>alert("신고완료!");');
+            }
+        });
+    });
+}
+const formatDateTime = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ');
+    return formattedDate
 }

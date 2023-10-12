@@ -1,4 +1,4 @@
-<body>
+<body>    
     <!-- 제목 -->
     <h1 id="title"><%= title %></h1>
     
@@ -7,10 +7,10 @@
       <thead>
         <tr>
           <th>번호</th>
-          <th>신고 시각</th>
+          <th>사고 시각</th>
           <th>선박명</th>
           <th>위치</th>
-          <th>비고</th>
+          <th>위험 단계</th>
         </tr>
       </thead>
       <tbody>
@@ -21,10 +21,11 @@
             <td><%= formatDateTime(data[i].datatime) %></td>
             <td><%= data[i].ship_name %></td>
             <td><%= data[i].location %></td>
-            <td><%= data[i].etc %></td>
+            <td><%= data[i].stage %></td>
           </tr> 
         <% } %>
     
       </tbody>
+    
     </table>
-  </body>
+    </body>
