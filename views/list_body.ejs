@@ -1,34 +1,77 @@
 <body>
-<script src="https://unpkg.com/htmx.org@1.9.5"></script>
-<!-- 로그아웃 버튼 -->
-<a hx-post="/logout" class="logout-btn">로그아웃</a>
+  <div id="login-success" class="toast align-items-center bg-success text-white position-absolute top-0 end-0"
+    role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body text-white">
+        로그인성공!
+      </div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+  <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+  <section class="intro">
+    <div class="bg-image h-100" style="background: linear-gradient(to right, #21c8e5, rgba(37, 117, 252, 1))">
+      <a hx-post="/logout" class="btn btn-danger">로그아웃</a>
+      <div class="mask d-flex align-items-center h-100">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div class="card shadow-2-strong" style="background-color: #f5f7fa;">
 
-<!-- 선박관제 시스템 제목 -->
-<h1 id="title"><%= title %></h1>
+                <div class="card-body">
 
-<!-- 테이블 -->
-<table style="border-collapse: collapse;">
-  <thead>
-    <tr>
-      <th>번호</th>
-      <th>선박명</th>
-      <th>위치</th>
-      <th>단계</th>
-      <th>제어</th>
-    </tr>
-  </thead>
-  <tbody>
-    <!-- 테이블 내용 추가 -->
-    <% for (let i = 0; i < ships.length; i++) { %>
-      <tr>
-        <td><%= i+1 %></td>
-        <td id="sname"><%= ships[i].ship_name %></td>
-        <td><%= ships[i].location %></td>
-        <td><%= ships[i].stage %></td>
-        <td><a href="/control?param=<%- ships[i].ship_name %>">관제</a></td>
-      </tr>
-    <% } %>
-
-  </tbody>
-</table>
+                  <div class="table-responsive">
+                    <table class="table table-borderless mb-0">
+                      <thead>
+                        <tr>
+                          <th scope="col">번호</th>
+                          <th scope="col">선박명</th>
+                          <th scope="col">위치</th>
+                          <th scope="col">단계</th>
+                          <th scope="col">관제하러가기</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% for (let i=0; i < ships.length; i++) { %>
+                          <tr>
+                            <td>
+                              <%= i+1 %>
+                            </td>
+                            <td id="sname">
+                              <%= ships[i].ship_name %>
+                            </td>
+                            <td>
+                              <%= ships[i].location %>
+                            </td>
+                            <td>
+                              <% if (ships[i].stage===0) { %>
+                                <span class="text-success">돌고래 <%= ships[i].stage %>단계</span>
+                                <% } else if (ships[i].stage===1) { %>
+                                  <span class="text-warning">돌고래 <%= ships[i].stage %>단계</span>
+                                  <% } else if (ships[i].stage===2) { %>
+                                    <span class="text-danger">돌고래 <%= ships[i].stage %>단계</span>
+                                    <% } %>
+                            </td>
+                            <td><a class="btn btn-success btn-sm px-3" href="/control?param=<%- ships[i].ship_name %>"
+                                target="_blank">관제<i class="fas fa-times"></i></a></td>
+                          </tr>
+                          <% } %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    const value = window.location.href.split('?')[1].split('=')[1];
+    if (value == 3) { //로그인 성공
+      let msg = document.getElementById('login-success');
+      let toastBootstrap = bootstrap.Toast.getOrCreateInstance(msg); toastBootstrap.show();
+    }
+  </script>
 </body>

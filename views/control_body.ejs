@@ -7,19 +7,28 @@
                 <th>수동제어 패널</th>
             </tr>
             <tr>
-                <td>대응 단계 : <%= ship.stage %></td>
+                <td>대응 단계 : <%= ship.stage %>
+                </td>
             </tr>
             <tr>
-                <td>AIS : <%= ship.ais %></td>
+                <td>
+                    <button onclick="handleButtonClick('<%= ship.ais %>','ais')">AIS</button>
+                </td>
             </tr>
             <tr>
-                <td>SSAS : <%= ship.ssas %></td>ss
+                <td>
+                    <button onclick="handleButtonClick('<%= ship.ssas %>','ssas')">SSAS</button>
+                </td>
             </tr>
             <tr>
-                <td>경보 : <%= ship.speaker %></td>
+                <td>
+                    <button onclick="handleButtonClick('<%= ship.speaker %>','speaker')">경보</button>
+                </td>
             </tr>
             <tr>
-                <td>Elect Blow : <%= ship.eb %></td>
+                <td>
+                    <button onclick="handleButtonClick('<%= ship.eb %>','eb')">Elect Blow</button>
+                </td>
             </tr>
         </thead>
     </table>
@@ -27,19 +36,23 @@
         <button onclick="manual_report()">수동 신고</button><br>
         <button onclick="openAccidentLog()">해양수산부</button><br>
         <button onclick="openEventLog()">사고 기록 확인</button><br>
+        <button id="modeButton" onclick="toggleMode()">수동 제어 모드</button>
     </div>
     <table>
         <thead>
-          <tr>
-            <th><a hx-post="/disconnect" class="back-btn">연결종료</a></th>
-            <div table-box>
-                <th>선박명 : <%= ship.ship_name %></th>
-                <th>연결상태 : <%= connect %></th>
-                <th>SOG : <%= ship.sog %>knt</th>
-                <th>COG : <%= ship.cog %>°</th>
-                <th>위치 : <%= ship.location %></th>
-            </div>
-          </tr>
+            <tr>
+                <div table-box>
+                    <th>선박명 : <%= ship.ship_name %>
+                    </th>
+                    <th>연결상태 : <%= connect %>
+                    </th>
+                    <th>SOG : <%= ship.sog %>knt</th>
+                    <th>COG : <%= ship.cog %>°</th>
+                    <th>위치 : <%= ship.location %>
+                    </th>
+                </div>
+                <div id="tableContainer"></div>
+            </tr>
         </thead>
     </table>
     <div id="video-box">
@@ -47,33 +60,153 @@
     </div>
     <script>
         const openNewWindow = (url) => {
-          var newWindow = window.open(url, "_blank");
+            var newWindow = window.open(url, "_blank");
         }
-    
+
         const openAccidentLog = () => {
-          openNewWindow('/accident-log');
+            openNewWindow('/accident-log');
         }
-    
+
         const openEventLog = () => {
-          openNewWindow('/event-log');
+            openNewWindow('/event-log');
         }
         const manual_report = () => {
-            const url = "/report";
-            const data = {
-                datetime: new Date(),
-                shipN : "<%= ship.ship_name %>",
-                location : "<%= ship.location %>",
-                stage : "<%= ship.stage %>",
-            };
-            fetch(url,{
-                method:'POST',
-                headers: {
-                    'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-                },
-                body: JSON.stringify(data) // 데이터를 JSON 문자열로 변환하여 전송
-            }).catch(error=>{
-                console.error("post 에러");
-            });
+            const inputValue = prompt("기록 사항을 입력해주세요.");
+            if (inputValue) {
+                const url = "/report";
+                const data = {
+                    datetime: new Date(),
+                    shipN: "<%= ship.ship_name %>",
+                    location: "<%= ship.location %>",
+                    stage: "<%= ship.stage %>",
+                    etc: inputValue,
+                };
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                    },
+                    body: JSON.stringify(data) // 데이터를 JSON 문자열로 변환하여 전송
+                }).then(() => { alert("신고 완료!"); })
+                    .catch(error => {
+                        console.error("post 에러");
+                    });
+            }
         }
-      </script>
+
+        window.onload = () => {
+            let isManualMode = false;
+            getPirateInfo();
+        };
+        const getPirateInfo = () => {
+            fetch('http://localhost:8080/pirate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'country_name': '<%= ship.location%>' })
+            }).then(response => {
+                if (response.ok) {
+                    return response.json(); // JSON 형식으로 변환
+                } else {
+                    throw new Error('Error:', response.status);
+                }
+            }).then(data => {
+                const tableContainer = document.getElementById('tableContainer');
+
+                // 테이블 생성
+                const table = document.createElement('table');
+
+                // 테이블 헤더 생성
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+
+                const headers = ['번호', '나라', '날짜', '사고유형'];
+
+                headers.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+
+                thead.appendChild(headerRow);
+
+                // 테이블 본문 생성
+                const tbody = document.createElement('tbody');
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+
+                    item.forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
+                    });
+
+                    tbody.appendChild(row);
+                });
+
+                // 테이블에 헤더와 본문 추가
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                // 테이블을 컨테이너에 추가
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(table);
+            })
+                .catch(error => { console.error("POST 에러", error) });
+        }
+        let isManualMode = "";
+        const toggleMode = () => {
+            isManualMode = !isManualMode;
+            const modeButtonElement = document.getElementById('modeButton');
+            if (isManualMode) {
+                modeButtonElement.textContent = '수동 제어 모드 작동중';
+                // 선박으로 수동제어 모드 작동 명령 전달
+            } else {
+                modeButtonElement.textContent = '수동 제어 모드';
+                // 선박으로 수동제어 모드 해제 명령 전달
+            }
+            // 선박으로 수동 제어모드 만들기
+            // const url = ""
+            // fetch(url, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+            //     },
+            //     body: JSON.stringify({order:isManualMode}) // 데이터를 JSON 문자열로 변환하여 전송
+            // }).catch(error => {
+            //     console.error("post 에러");
+            // });
+        }
+        const handleButtonClick = (value, module) => {
+            if (isManualMode) {
+                if (value) {
+                    // 빨간색
+                    const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
+                    fetch('/manual', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                        },
+                        body: JSON.stringify(query)
+                    })
+                }
+                else {
+                    // 초록색
+                    const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
+                    fetch('/manual', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                        },
+                        body: JSON.stringify(query)
+                    })
+                }
+            }
+            else {
+                alert("수동 제어모드를 활성화 시켜주세요!");
+            }
+        }
+    </script>
 </body>

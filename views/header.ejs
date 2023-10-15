@@ -2,5 +2,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
+    <% if (title == "해양수산부") { %>
+        <link rel="icon" href="favicon/sea.png">
+    <% } else { %>
+        <link rel="icon" href="favicon/favicon.png">
+    <% }%>
     <link rel = "stylesheet" type="text/css" href="css/<%= cssfiles %>.css" />
+    <link rel = "stylesheet" type="text/css" href="/css/bootstrap.min.css">
 </head>

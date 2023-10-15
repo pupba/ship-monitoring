@@ -15,16 +15,18 @@ module.exports = (app,connection,crypto,query) =>{
                 return;
             }
             else if (results.length === 0){
-                res.send('<script>alert("아이디를 확인해주세요!"); window.location.href="/";</script>');
+                res.send('<script>window.location.href="/?parm1=1";</script>');
             }
             else{
                 const check = results[0].password_hash;
                 const hash = crypto.createHash('sha256').update(password).digest('hex');
                 if(hash == check){
-                    res.send('<script>alert("로그인 성공!"); window.location.href="/list";</script>')
+                    html = '<script>window.location.href="/list?parm1=3";</script>';
+                    res.send(html)
                 }
                 else {
-                    res.send('<script>alert("비밀번호를 확인해주세요!"); window.location.href="/";</script>');
+                    html = '<script>window.location.href="/?parm1=2";</script>';
+                    res.send(html);
                 }
             }
         })
@@ -50,7 +52,7 @@ module.exports = (app,connection,crypto,query) =>{
     });
     /** 로그아웃 처리 */
     app.post("/logout",(req,res)=>{
-        res.send('<script>alert("로그아웃!"); window.location.href="/";</script>');
+        res.send('<script>window.location.href="/";</script>');
     });
     /** Main 관제 페이지 : 선박 관제 페이지 */
     app.get("/control",(req,res)=>{
@@ -72,7 +74,7 @@ module.exports = (app,connection,crypto,query) =>{
             }
         });
     });
-    /** 신고기록 */
+    /** 해양수산부 */
     app.get("/accident-log",(req,res)=>{
         const query = "SELECT * FROM accident_log";
         connection.query(query,(err,results)=>{
@@ -83,7 +85,7 @@ module.exports = (app,connection,crypto,query) =>{
             else {
                 const data = results;
                 res.render("accident",{
-                    title: "신고기록",
+                    title: "해양수산부",
                     cssfiles : "accident",
                     data : data,
                     formatDateTime
@@ -127,7 +129,7 @@ module.exports = (app,connection,crypto,query) =>{
         else{
             stage = "돌고래 2단계";
         }
-        const query1 = "INSERT INTO accident_log(datatime,ship_name,location,etc) VALUES ('"+formatDateTime(data.datetime)+"','"+data.shipN+"','"+data.location+"','"+"bording"+"')";
+        const query1 = "INSERT INTO accident_log(datatime,ship_name,location,etc) VALUES ('"+formatDateTime(data.datetime)+"','"+data.shipN+"','"+data.location+"','"+data.etc+"')";
         const query2 = "INSERT INTO event_log(datatime,ship_name,location,stage) VALUES ('"+formatDateTime(data.datetime)+"','"+data.shipN+"','"+data.location+"','"+stage+"')";
         connection.query(query1,(err,results)=>{
             if (err) {
@@ -145,6 +147,32 @@ module.exports = (app,connection,crypto,query) =>{
             }
         });
     });
+    /** 테러대응 수동제어 */
+    app.post("/manual",(req,res)=>{
+        const query = req.body.query;
+        connection.query(query,(err,results)=>{
+            if (err) {
+                console.error('쿼리오류',err);
+                return;
+            }
+            else{
+                // 테러대응 선박으로 제어 명령 전송
+                const tmp = query.split(" ")[3];
+                const order = {module:tmp.split("=")[0],status:tmp.split("=")[1]};
+                console.log(order);
+                // const url = ""
+                // fetch(url, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                //     },
+                //     body: JSON.stringify(order) // 데이터를 JSON 문자열로 변환하여 전송
+                // }).catch(error => {
+                //     console.error("post 에러");
+                // });
+            }
+        });
+    })
 }
 const formatDateTime = (dateTimeString) => {
     const date = new Date(dateTimeString);
