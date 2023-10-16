@@ -1,212 +1,205 @@
 <body>
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
-    <!--좌측-->
-    <table>
-        <thead>
-            <tr>
-                <th>수동제어 패널</th>
-            </tr>
-            <tr>
-                <td>대응 단계 : <%= ship.stage %>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button onclick="handleButtonClick('<%= ship.ais %>','ais')">AIS</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button onclick="handleButtonClick('<%= ship.ssas %>','ssas')">SSAS</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button onclick="handleButtonClick('<%= ship.speaker %>','speaker')">경보</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button onclick="handleButtonClick('<%= ship.eb %>','eb')">Elect Blow</button>
-                </td>
-            </tr>
-        </thead>
-    </table>
-    <div id="btn2">
-        <button onclick="manual_report()">수동 신고</button><br>
-        <button onclick="openAccidentLog()">해양수산부</button><br>
-        <button onclick="openEventLog()">사고 기록 확인</button><br>
-        <button id="modeButton" onclick="toggleMode()">수동 제어 모드</button>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <div table-box>
-                    <th>선박명 : <%= ship.ship_name %>
-                    </th>
-                    <th>연결상태 : <%= connect %>
-                    </th>
-                    <th>SOG : <%= ship.sog %>knt</th>
-                    <th>COG : <%= ship.cog %>°</th>
-                    <th>위치 : <%= ship.location %>
-                    </th>
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+            </div>
+            <h2 class="text-center">수동제어 패널</h2>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">
+                    <button class="btn btn-danger" id="modeButton" onclick="toggleMode()">수동제어모드</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>대응단계</b><button class="btn btn-success">돌고래 0단계</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>AIS</b>
+                    <button id="ais" class="btn <%= ship.ais === 1 ? 'btn-success' : 'btn-danger' %>"
+                        onclick="handleButtonClick('<%= ship.ais %>','ais')">
+                        <%= ship.ais===1 ? 'ON' : 'OFF' %>
+                    </button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>SSAS</b>
+                    <button id="ssas" class="btn <%= ship.ais === 1 ? 'btn-success' : 'btn-danger' %>"
+                        onclick="handleButtonClick('<%= ship.ssas %>','ssas');">
+                        <%= ship.ssas===1 ? 'ON' : 'OFF' %>
+                    </button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>경보</b>
+                    <button id="speaker" class="btn <%= ship.speaker === 1 ? 'btn-success' : 'btn-danger' %>"
+                        onclick="handleButtonClick('<%= ship.speaker %>','speaker')">
+                        <%= ship.speaker===1 ? 'ON' : 'OFF' %>
+                    </button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>Electronic Blow</b>
+                    <button id="eb" class="btn <%= ship.eb === 1 ? 'btn-success' : 'btn-danger' %>"
+                        onclick="handleButtonClick('<%= ship.eb %>','eb')">
+                        <%= ship.eb===1 ? 'ON' : 'OFF' %>
+                    </button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-danger btn-lg" onclick="manual_report()">수동신고</button>
+                </li>
+            </ul>
+
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">
+                    <a class="btn btn-info btn-lg" onclick="openW()">해적정보 확인</a>
+                    <!-- <a href="/pirate?location=<%- ship.location %>" target="_blank" class="btn btn-info btn-lg">해적정보 확인</a>
+                    -->
+                    </li>
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="openAccidentLog()">해양수산부</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="openEventLog()">사고기록 확인</button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th><b class="text-primary">선박명</b> : <%= ship.ship_name %>
+                                    </th>
+                                    <th><b class="text-primary">연결상태</b> : <%= connect %>
+                                    </th>
+                                    <th><b class="text-primary">SOG</b> : <%= ship.sog %>knt</th>
+                                    <th><b class="text-primary">COG</b> : <%= ship.cog %>°</th>
+                                    <th><b class="text-primary">위치</b> : <%= ship.location %>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tableContainer"></div>
                 </div>
-                <div id="tableContainer"></div>
-            </tr>
-        </thead>
-    </table>
-    <div id="video-box">
-        <video></video>
-    </div>
-    <script>
-        const openNewWindow = (url) => {
-            var newWindow = window.open(url, "_blank");
-        }
+            </nav>
 
-        const openAccidentLog = () => {
-            openNewWindow('/accident-log');
-        }
-
-        const openEventLog = () => {
-            openNewWindow('/event-log');
-        }
-        const manual_report = () => {
-            const inputValue = prompt("기록 사항을 입력해주세요.");
-            if (inputValue) {
-                const url = "/report";
-                const data = {
-                    datetime: new Date(),
-                    shipN: "<%= ship.ship_name %>",
-                    location: "<%= ship.location %>",
-                    stage: "<%= ship.stage %>",
-                    etc: inputValue,
-                };
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-                    },
-                    body: JSON.stringify(data) // 데이터를 JSON 문자열로 변환하여 전송
-                }).then(() => { alert("신고 완료!"); })
-                    .catch(error => {
-                        console.error("post 에러");
-                    });
+            <div id="video-container" class="embed-responsive embed-responsive-16by9">
+                <iframe width="90%" height="100%" src="https://www.youtube.com/embed/rDFUl2mHIW4?si=aqYV9bYal5rVUFK5"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </div>
+        </div>
+        <script>
+            const openNewWindow = (url) => {
+                var newWindow = window.open(url, "_blank");
             }
-        }
 
-        window.onload = () => {
-            let isManualMode = false;
-            getPirateInfo();
-        };
-        const getPirateInfo = () => {
-            fetch('http://localhost:8080/pirate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 'country_name': '<%= ship.location%>' })
-            }).then(response => {
-                if (response.ok) {
-                    return response.json(); // JSON 형식으로 변환
-                } else {
-                    throw new Error('Error:', response.status);
-                }
-            }).then(data => {
-                const tableContainer = document.getElementById('tableContainer');
-
-                // 테이블 생성
-                const table = document.createElement('table');
-
-                // 테이블 헤더 생성
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
-
-                const headers = ['번호', '나라', '날짜', '사고유형'];
-
-                headers.forEach(headerText => {
-                    const th = document.createElement('th');
-                    th.textContent = headerText;
-                    headerRow.appendChild(th);
-                });
-
-                thead.appendChild(headerRow);
-
-                // 테이블 본문 생성
-                const tbody = document.createElement('tbody');
-
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-
-                    item.forEach(cellData => {
-                        const cell = document.createElement('td');
-                        cell.textContent = cellData;
-                        row.appendChild(cell);
-                    });
-
-                    tbody.appendChild(row);
-                });
-
-                // 테이블에 헤더와 본문 추가
-                table.appendChild(thead);
-                table.appendChild(tbody);
-
-                // 테이블을 컨테이너에 추가
-                tableContainer.innerHTML = '';
-                tableContainer.appendChild(table);
-            })
-                .catch(error => { console.error("POST 에러", error) });
-        }
-        let isManualMode = "";
-        const toggleMode = () => {
-            isManualMode = !isManualMode;
-            const modeButtonElement = document.getElementById('modeButton');
-            if (isManualMode) {
-                modeButtonElement.textContent = '수동 제어 모드 작동중';
-                // 선박으로 수동제어 모드 작동 명령 전달
-            } else {
-                modeButtonElement.textContent = '수동 제어 모드';
-                // 선박으로 수동제어 모드 해제 명령 전달
+            const openAccidentLog = () => {
+                openNewWindow('/accident-log');
             }
-            // 선박으로 수동 제어모드 만들기
-            // const url = ""
-            // fetch(url, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-            //     },
-            //     body: JSON.stringify({order:isManualMode}) // 데이터를 JSON 문자열로 변환하여 전송
-            // }).catch(error => {
-            //     console.error("post 에러");
-            // });
-        }
-        const handleButtonClick = (value, module) => {
-            if (isManualMode) {
-                if (value) {
-                    // 빨간색
-                    const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
-                    fetch('/manual', {
+
+            const openEventLog = () => {
+                openNewWindow('/event-log');
+            }
+            const manual_report = () => {
+                const inputValue = prompt("기록 사항을 입력해주세요.");
+                if (inputValue) {
+                    const url = "/report";
+                    const data = {
+                        datetime: new Date(),
+                        shipN: "<%= ship.ship_name %>",
+                        location: "<%= ship.location %>",
+                        stage: "<%= ship.stage %>",
+                        etc: inputValue,
+                    };
+                    fetch(url, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
                         },
-                        body: JSON.stringify(query)
-                    })
+                        body: JSON.stringify(data) // 데이터를 JSON 문자열로 변환하여 전송
+                    }).then(() => { alert("신고 완료!"); })
+                        .catch(error => {
+                            console.error("post 에러");
+                        });
+                }
+            }
+
+            window.onload = () => {
+                let isManualMode = false;
+            };
+            let isManualMode = "";
+            const toggleMode = () => {
+                isManualMode = !isManualMode;
+                const modeButtonElement = document.getElementById('modeButton');
+                if (isManualMode) {
+                    modeButtonElement.textContent = '수동 제어 모드 작동중';
+                    modeButtonElement.classList.remove('btn-danger');
+                    modeButtonElement.classList.add('btn-success');
+                    // 선박으로 수동제어 모드 작동 명령 전달
+                } else {
+                    modeButtonElement.textContent = '수동 제어 모드';
+                    modeButtonElement.classList.remove('btn-success');
+                    modeButtonElement.classList.add('btn-danger');
+                    // 선박으로 수동제어 모드 해제 명령 전달
+                }
+                // 선박으로 수동 제어모드 명령
+                // const url = ""
+                // fetch(url, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                //     },
+                //     body: JSON.stringify({order:isManualMode}) // 데이터를 JSON 문자열로 변환하여 전송
+                // }).catch(error => {
+                //     console.error("post 에러");
+                // });
+            }
+            const handleButtonClick = (value, module) => {
+                const modeButtonElement = document.getElementById(module);
+                console.log(value);
+                if (isManualMode) {
+                    if (value) {
+                        value = 0;
+                        // 빨간색
+                        modeButtonElement.classList.remove('btn-success');
+                        modeButtonElement.classList.add('btn-danger');
+                        console.log(modeButtonElement);
+                        const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
+                        fetch('/manual', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                            },
+                            body: JSON.stringify(query)
+                        })
+                    }
+                    else {
+                        // 초록색
+                        value = 1;
+                        modeButtonElement.classList.remove('btn-danger');
+                        modeButtonElement.classList.add('btn-success');
+                        console.log(modeButtonElement);
+                        const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
+                        fetch('/manual', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                            },
+                            body: JSON.stringify(query)
+                        })
+                    }
                 }
                 else {
-                    // 초록색
-                    const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
-                    fetch('/manual', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-                        },
-                        body: JSON.stringify(query)
-                    })
+                    alert("수동 제어모드를 활성화 시켜주세요!");
                 }
             }
-            else {
-                alert("수동 제어모드를 활성화 시켜주세요!");
+            const openW = () =>{
+                const newWindow = window.open("/pirate?location=<%- ship.location %>","_blank");
+                newWindow.resize(500,800);
             }
-        }
-    </script>
+        </script>
 </body>

@@ -172,7 +172,16 @@ module.exports = (app,connection,crypto,query) =>{
                 // });
             }
         });
-    })
+    });
+    /** 해적정보 */
+    app.get("/pirate",(req,res)=>{
+        const paramValue = req.query.location;
+        res.render("pirate",{
+            title: "해적정보",
+            cssfiles : "pirate",
+            location : paramValue
+        });
+     });
 }
 const formatDateTime = (dateTimeString) => {
     const date = new Date(dateTimeString);

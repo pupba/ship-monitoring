@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="./static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./index.css" />
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <ul class="list-unstyled CTAs">
+                    <li>
+                        <a href="" class="btn btn-danger">Disconnect</a>
+                    </li>
+                </ul>
+            </div>
+            <h2 class="text-center">수동제어 패널</h2>
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">
+                    <button class="btn btn-success">수동제어모드</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>대응단계</b><button class="btn btn-success">돌고래 0단계</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>AIS</b><button class="btn btn-success">ON</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>SSAS</b><button class="btn btn-success">ON</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>경보</b><button class="btn btn-success">ON</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <b>Electronic Blow</b><button class="btn btn-success">ON</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-danger btn-lg">수동신고</button>
+                </li>
+            </ul>
+
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-info btn-lg">해적정보 확인</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-primary btn-lg">해양수산부</button>
+                </li>
+                <li class="list-group-item list-group-item-light">
+                    <button type="button" class="btn btn-secondary btn-lg">사고기록 확인</button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th>선박명 : <%= ship.ship_name %>
+                                    </th>
+                                    <th>연결상태 : <%= connect %>
+                                    </th>
+                                    <th>SOG : <%= ship.sog %>knt</th>
+                                    <th>COG : <%= ship.cog %>°</th>
+                                    <th>위치 : <%= ship.location %>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tableContainer"></div>
+                </div>
+            </nav>
+
+            <div id="video-container" class="embed-responsive embed-responsive-16by9">
+                <iframe width="90%" height="100%" src="https://www.youtube.com/embed/rDFUl2mHIW4?si=aqYV9bYal5rVUFK5"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+            </div>
+        </div>
+</body>
+
+</html>

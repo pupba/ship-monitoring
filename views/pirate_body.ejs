@@ -1,0 +1,95 @@
+<body>
+    <body>
+        <section class="intro">
+          <div class="bg-image h-100">
+            <div class="mask d-flex align-items-center h-100">
+              <div class="container">
+                <div class="row justify-content-center">
+                  <div class="col-12">
+                    <div class="card shadow-2-strong">
+                      <div class="card-body p-0">
+                        <div id= "tableContainer" class="table-responsive table-scroll" data-mdb-perfect-scrollbar="true"
+                          style="position: relative; height: 700px">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      
+      </body>
+    <script>
+        window.onload = () =>{
+            getPirateInfo();
+        }
+        const getPirateInfo = () => {
+            fetch('http://localhost:8080/pirate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'country_name': '<%= location%>' })
+            }).then(response => {
+                if (response.ok) {
+                    return response.json(); // JSON 형식으로 변환
+                } else {
+                    throw new Error('Error:', response.status);
+                }
+            }).then(data => {
+                const tableContainer = document.getElementById('tableContainer');
+                // 캡션 생성
+                const caption = document.createElement('h1');
+                caption.setAttribute('class','text-warning bg-dark mb-0');
+                caption.setAttribute('style','text-align: center');
+                caption.textContent = '<%= location %> 해역 정보';
+                
+                // 테이블 생성
+                const table = document.createElement('table');
+                table.setAttribute('class','table table-borderless mb-0');
+                // 테이블 헤더 생성
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+
+                const headers = ['번호', '나라', '날짜', '사고유형'];
+
+                headers.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    th.setAttribute('scope','col');
+                    headerRow.appendChild(th);
+                });
+
+                thead.appendChild(headerRow);
+
+                // 테이블 본문 생성
+                const tbody = document.createElement('tbody');
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+
+                    item.forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.textContent = cellData;
+            
+                        row.appendChild(cell);
+                    });
+
+                    tbody.appendChild(row);
+                });
+
+                // 테이블에 헤더와 본문 추가
+                table.appendChild(thead);
+                table.appendChild(tbody);
+                
+                // 테이블을 컨테이너에 추가
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(caption);
+                tableContainer.appendChild(table);
+            })
+                .catch(error => { console.error("POST 에러", error) });
+        }
+    </script>
+</body>
