@@ -11,7 +11,17 @@
                     <button class="btn btn-danger" id="modeButton" onclick="toggleMode()">수동제어모드</button>
                 </li>
                 <li class="list-group-item list-group-item-light">
-                    <b>대응단계</b><button class="btn btn-success">돌고래 0단계</button>
+                    <b>대응단계</b><button id="stage"
+                        class="btn <%= ship.stage === 0 ? 'btn-success' : (ship.stage === 1 ? 'btn-warning' : 'btn-danger') %>"
+                        onclick="manualStage('<%= ship.stage %>')">
+                        <% if (ship.stage===0) { %>
+                            돌고래 0단계
+                            <% } else if (ship.stage===1) { %>
+                                돌고래 1단계
+                                <% } else if (ship.stage===2) { %>
+                                    돌고래 2단계
+                                    <% } %>
+                    </button>
                 </li>
                 <li class="list-group-item list-group-item-light">
                     <b>AIS</b>
@@ -22,7 +32,7 @@
                 </li>
                 <li class="list-group-item list-group-item-light">
                     <b>SSAS</b>
-                    <button id="ssas" class="btn <%= ship.ais === 1 ? 'btn-success' : 'btn-danger' %>"
+                    <button id="ssas" class="btn <%= ship.ssas === 1 ? 'btn-success' : 'btn-danger' %>"
                         onclick="handleButtonClick('<%= ship.ssas %>','ssas');">
                         <%= ship.ssas===1 ? 'ON' : 'OFF' %>
                     </button>
@@ -51,7 +61,7 @@
                     <a class="btn btn-info btn-lg" onclick="openW()">해적정보 확인</a>
                     <!-- <a href="/pirate?location=<%- ship.location %>" target="_blank" class="btn btn-info btn-lg">해적정보 확인</a>
                     -->
-                    </li>
+                </li>
                 <li class="list-group-item list-group-item-light">
                     <button type="button" class="btn btn-primary btn-lg" onclick="openAccidentLog()">해양수산부</button>
                 </li>
@@ -160,46 +170,117 @@
             }
             const handleButtonClick = (value, module) => {
                 const modeButtonElement = document.getElementById(module);
-                console.log(value);
+                // 토글 버튼을 위한 처리
+                const state = modeButtonElement.className.split(" ")[1].split("-")[1];
+                let msg = {}
                 if (isManualMode) {
-                    if (value) {
-                        value = 0;
-                        // 빨간색
+                    // ON 상태일 경우
+                    if (state == "success") { // OFF로 변경
+                        value = false;
                         modeButtonElement.classList.remove('btn-success');
                         modeButtonElement.classList.add('btn-danger');
-                        console.log(modeButtonElement);
-                        const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
-                        fetch('/manual', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-                            },
-                            body: JSON.stringify(query)
-                        })
-                    }
-                    else {
-                        // 초록색
-                        value = 1;
+                        modeButtonElement.textContent = "OFF";
+                    }// OFF 상태일 경우
+                    else if (state == "danger") { // ON로 변경
+                        value = true;
                         modeButtonElement.classList.remove('btn-danger');
                         modeButtonElement.classList.add('btn-success');
-                        console.log(modeButtonElement);
-                        const query = { query: 'UPDATE ship_status SET ' + module + '=' + !value + ' WHERE ship_name="<%= ship.ship_name%>"' }
-                        fetch('/manual', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-                            },
-                            body: JSON.stringify(query)
-                        })
+                        modeButtonElement.textContent = "ON";
                     }
+                    msg = { query: 'UPDATE ship_status SET ' + module + '=' + value + ' WHERE ship_name="<%= ship.ship_name%>"' }
+                    fetch('/manual', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                        },
+                        body: JSON.stringify(msg)
+                    })
                 }
                 else {
                     alert("수동 제어모드를 활성화 시켜주세요!");
                 }
             }
-            const openW = () =>{
-                const newWindow = window.open("/pirate?location=<%- ship.location %>","_blank");
-                newWindow.resize(500,800);
+            const manualStage = (value) => {
+                const modeButtonElement = document.getElementById("stage");
+                const state = modeButtonElement.className.split(" ")[1].split("-")[1];
+                let msg = {}
+                let changeValue = 0
+                if (isManualMode) {
+                    if (state == "success") {
+                        changeValue = 1
+                        modeButtonElement.classList.remove('btn-success');
+                        modeButtonElement.classList.add('btn-warning');
+                        modeButtonElement.textContent = "돌고래 1단계";
+                    }
+                    else if (state == "warning") {
+                        changeValue = 2
+                        modeButtonElement.classList.remove('btn-warning');
+                        modeButtonElement.classList.add('btn-danger');
+                        modeButtonElement.textContent = "돌고래 2단계";
+                    }
+                    else if (state == "danger") {
+                        changeValue = 0
+                        modeButtonElement.classList.remove('btn-danger');
+                        modeButtonElement.classList.add('btn-success');
+                        modeButtonElement.textContent = "돌고래 0단계";
+                    }
+                    msg = modeSet(state, changeValue);
+                    fetch('/manual', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                        },
+                        body: JSON.stringify(msg)
+                    })
+                }
+                else {
+                    alert("수동 제어모드를 활성화 시켜주세요!");
+                }
+            }
+            const openW = () => {
+                const newWindow = window.open("/pirate?location=<%- ship.location %>", "_blank");
+                newWindow.resize(500, 800);
+            }
+            const modeSet = (stage, changeValue) => {
+                let query = {}
+                const arr = [document.getElementById("ssas")
+                    , document.getElementById("speaker")
+                    , document.getElementById("eb")];
+                const ais = document.getElementById("ais");
+                if (stage == "success") { // warning으로
+                    msg = { query: 'UPDATE ship_status SET stage=' + changeValue + ', ais=false, ssas=false, speaker=false, eb=false WHERE ship_name="<%= ship.ship_name %>"' }
+                    ais.classList.remove('btn-success');
+                    ais.classList.add('btn-danger');
+                    ais.textContent = "OFF";
+                    arr.forEach(item => {
+                        item.classList.remove('btn-success');
+                        item.classList.add('btn-danger');
+                        item.textContent = "OFF";
+                    });
+                }
+                else if (stage == "warning") { // danger으로
+                    msg = { query: 'UPDATE ship_status SET stage=' + changeValue + ', ais=false, ssas=true, speaker=true, eb=true WHERE ship_name="<%= ship.ship_name %>"' }
+                    ais.classList.remove('btn-success');
+                    ais.classList.add('btn-danger');
+                    ais.textContent = "OFF";
+                    arr.forEach(item => {
+                        item.classList.remove('btn-danger');
+                        item.classList.add('btn-success');
+                        item.textContent = "ON";
+                    })
+                }
+                else if (stage == "danger") { // success으로
+                    msg = { query: 'UPDATE ship_status SET stage=' + changeValue + ', ais=true, ssas=false, speaker=false, eb=false WHERE ship_name="<%= ship.ship_name %>"' }
+                    ais.classList.remove('btn-danger');
+                    ais.classList.add('btn-success');
+                    ais.textContent = "ON";
+                    arr.forEach(item => {
+                        item.classList.remove('btn-success');
+                        item.classList.add('btn-danger');
+                        item.textContent = "OFF";
+                    })
+                }
+                return msg
             }
         </script>
 </body>
