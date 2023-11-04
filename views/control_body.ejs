@@ -96,13 +96,37 @@
             </nav>
 
             <div id="video-container" class="embed-responsive embed-responsive-16by9">
-                <iframe width="90%" height="100%" src="https://www.youtube.com/embed/rDFUl2mHIW4?si=aqYV9bYal5rVUFK5"
-                    title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
+                <img id="image" src="" width="90%" height="100%">
+                <div id="spinner" class="spinner-grow text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p id="text1" class="text-black">비디오 로딩중...</p>
             </div>
         </div>
         <script>
+            const updateImage = () => {
+                const spinner = document.getElementById('spinner');
+                const textSpinner = document.getElementById("text1");
+                fetch("http://172.20.10.2:8080/detect").then((response) => {
+                    return response.json();
+                })
+                    .then((data) => {
+                        spinner.style.display = 'none';
+                        textSpinner.style.display = 'none';
+                        let img = document.getElementById("image");
+                        img.style.display = 'block';
+                        let imageBase64 = data.image_data;
+                        console.log(imageBase64)
+                        img.src = "data:image/png;base64," + imageBase64;
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    })
+                    .finally(() => {
+                        setTimeout(updateImage, 33);
+                    })
+            }
+            updateImage();
             const openNewWindow = (url) => {
                 var newWindow = window.open(url, "_blank");
             }

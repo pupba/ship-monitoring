@@ -21,6 +21,7 @@ connection.connect((err)=>{
   console.log("Connect 성공!");
 })
 const app = express();
+/** 암호화 모듈 */
 const crypto = require('crypto');
 
 app.set("views",__dirname+"/views");

@@ -69,7 +69,8 @@ module.exports = (app,connection,crypto,query) =>{
                     title: "메인 관제 페이지",
                     cssfiles : "control",
                     ship: data[0],
-                    connect : "정상"
+                    connect : "정상",
+                    videoFeedUrl : "http://localhost:8080/video_feed"
                 });     
             }
         });

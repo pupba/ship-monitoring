@@ -1,16 +1,24 @@
 <body>
-    <body>
-        <section class="intro">
-          <div class="bg-image h-100">
-            <div class="mask d-flex align-items-center h-100">
-              <div class="container">
-                <div class="row justify-content-center">
-                  <div class="col-12">
-                    <div class="card shadow-2-strong">
-                      <div class="card-body p-0">
-                        <div id= "tableContainer" class="table-responsive table-scroll" data-mdb-perfect-scrollbar="true"
-                          style="position: relative; height: 700px">
+
+  <body>
+    <section class="intro">
+      <div class="bg-image h-100">
+        <div class="mask d-flex align-items-center h-100">
+          <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-12">
+                <div class="card shadow-2-strong">
+                  <div class="card-body p-0">
+                    <div id="tableContainer" class="table-responsive table-scroll" data-mdb-perfect-scrollbar="true"
+                      style="position: relative; height: 700px">
+                      <div id="loadingSpinner" class="d-flex justify-content-center align-items-center"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.7);">
+
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
                         </div>
+                        <p id="loadingText" class="text-center mt-2" style="font-size: 1.2rem; color: #000;">해적 정보를 가져오는
+                          중입니다.</p>
                       </div>
                     </div>
                   </div>
@@ -18,78 +26,92 @@
               </div>
             </div>
           </div>
-        </section>
-      
-      </body>
-    <script>
-        window.onload = () =>{
-            getPirateInfo();
+        </div>
+      </div>
+    </section>
+
+  </body>
+  <script>
+    window.onload = () => {
+      getPirateInfo();
+    }
+    const getPirateInfo = () => {
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const loadingText = document.getElementById('loadingText');
+      loadingSpinner.style.display = 'block'; // 스피너 표시
+      loadingText.style.display = 'block'; // 로딩 텍스트 표시
+
+      fetch('http://localhost:8080/pirate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'country_name': '<%= location%>' })
+      }).then(response => {
+        if (response.ok) {
+          return response.json(); // JSON 형식으로 변환
+        } else {
+          throw new Error('Error:', response.status);
         }
-        const getPirateInfo = () => {
-            fetch('http://localhost:8080/pirate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 'country_name': '<%= location%>' })
-            }).then(response => {
-                if (response.ok) {
-                    return response.json(); // JSON 형식으로 변환
-                } else {
-                    throw new Error('Error:', response.status);
-                }
-            }).then(data => {
-                const tableContainer = document.getElementById('tableContainer');
-                // 캡션 생성
-                const caption = document.createElement('h1');
-                caption.setAttribute('class','text-warning bg-dark mb-0');
-                caption.setAttribute('style','text-align: center');
-                caption.textContent = '<%= location %> 해역 정보';
-                
-                // 테이블 생성
-                const table = document.createElement('table');
-                table.setAttribute('class','table table-borderless mb-0');
-                // 테이블 헤더 생성
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
+      }).then(data => {
+        loadingSpinner.style.display = 'none'; // 스피너 숨김
+        loadingText.style.display = 'none'; // 로딩 텍스트 숨김
 
-                const headers = ['번호', '나라', '날짜', '사고유형'];
+        const tableContainer = document.getElementById('tableContainer');
+        // 캡션 생성
+        const caption = document.createElement('h1');
+        caption.setAttribute('class', 'text-warning bg-dark mb-0');
+        caption.setAttribute('style', 'text-align: center');
+        caption.textContent = '<%= location %> 해역 정보';
 
-                headers.forEach(headerText => {
-                    const th = document.createElement('th');
-                    th.textContent = headerText;
-                    th.setAttribute('scope','col');
-                    headerRow.appendChild(th);
-                });
+        // 테이블 생성
+        const table = document.createElement('table');
+        table.setAttribute('class', 'table table-borderless mb-0');
+        // 테이블 헤더 생성
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
 
-                thead.appendChild(headerRow);
+        const headers = ['번호', '나라', '날짜', '사고유형'];
 
-                // 테이블 본문 생성
-                const tbody = document.createElement('tbody');
+        headers.forEach(headerText => {
+          const th = document.createElement('th');
+          th.textContent = headerText;
+          th.setAttribute('scope', 'col');
+          headerRow.appendChild(th);
+        });
 
-                data.forEach(item => {
-                    const row = document.createElement('tr');
+        thead.appendChild(headerRow);
 
-                    item.forEach(cellData => {
-                        const cell = document.createElement('td');
-                        cell.textContent = cellData;
-            
-                        row.appendChild(cell);
-                    });
+        // 테이블 본문 생성
+        const tbody = document.createElement('tbody');
 
-                    tbody.appendChild(row);
-                });
+        data.forEach(item => {
+          const row = document.createElement('tr');
 
-                // 테이블에 헤더와 본문 추가
-                table.appendChild(thead);
-                table.appendChild(tbody);
-                
-                // 테이블을 컨테이너에 추가
-                tableContainer.innerHTML = '';
-                tableContainer.appendChild(caption);
-                tableContainer.appendChild(table);
-            })
-                .catch(error => { console.error("POST 에러", error) });
-        }
-    </script>
+          item.forEach(cellData => {
+            const cell = document.createElement('td');
+            cell.textContent = cellData;
+
+            row.appendChild(cell);
+          });
+
+          tbody.appendChild(row);
+        });
+
+        // 테이블에 헤더와 본문 추가
+        table.appendChild(thead);
+        table.appendChild(tbody);
+
+        // 테이블을 컨테이너에 추가
+        tableContainer.innerHTML = '';
+        tableContainer.appendChild(caption);
+        tableContainer.appendChild(table);
+      })
+        .catch(error => {
+          console.error("POST 에러", error);
+          loadingSpinner.style.display = 'none'; // 스피너 숨김
+          loadingText.style.display = 'none'; // 로딩 텍스트 숨김
+        });
+    }
+  </script>
 </body>
