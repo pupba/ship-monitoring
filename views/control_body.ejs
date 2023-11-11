@@ -107,7 +107,7 @@
             const updateImage = () => {
                 const spinner = document.getElementById('spinner');
                 const textSpinner = document.getElementById("text1");
-                fetch("http://172.20.10.2:8080/detect").then((response) => {
+                fetch("http://172.20.10.2:8081/detect").then((response) => {
                     return response.json();
                 })
                     .then((data) => {
@@ -181,16 +181,18 @@
                     // 선박으로 수동제어 모드 해제 명령 전달
                 }
                 // 선박으로 수동 제어모드 명령
-                // const url = ""
-                // fetch(url, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
-                //     },
-                //     body: JSON.stringify({order:isManualMode}) // 데이터를 JSON 문자열로 변환하여 전송
-                // }).catch(error => {
-                //     console.error("post 에러");
-                // });
+                const url = "http://172.20.10.6:5001/postdata";
+                // const url = "http://172.20.10.2:5003/postdata";
+                console.log(url);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                    },
+                    body: JSON.stringify({order:isManualMode}) // 데이터를 JSON 문자열로 변환하여 전송
+                }).catch(error => {
+                    console.error("post 에러");
+                });
             }
             const handleButtonClick = (value, module) => {
                 const modeButtonElement = document.getElementById(module);
@@ -211,6 +213,28 @@
                         modeButtonElement.classList.add('btn-success');
                         modeButtonElement.textContent = "ON";
                     }
+                    control = {o_order:""}
+                    if (module == "ais"){
+                        control['o_order'] = "ais-"+value
+                    }
+                    else if(module == "ssas"){
+                        control['o_order'] = "ssas-"+value
+                    }
+                    else if(module == "speaker"){
+                        control['o_order'] = "speaker-"+value
+                    }
+                    else if(module == "eb"){
+                        control['o_order'] = "eb-"+value
+                    }
+                    console.log(control);
+                    // 선박 시스템으로 전달
+                    const url = "http://172.20.10.6:5001/postdata"
+                    // const url = "http://172.20.10.2:5003/postdata";
+                    fetch(url,{
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body : JSON.stringify(control)
+                    });
                     msg = { query: 'UPDATE ship_status SET ' + module + '=' + value + ' WHERE ship_name="<%= ship.ship_name%>"' }
                     fetch('/manual', {
                         method: 'POST',
@@ -218,7 +242,7 @@
                             'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
                         },
                         body: JSON.stringify(msg)
-                    })
+                    });
                 }
                 else {
                     alert("수동 제어모드를 활성화 시켜주세요!");
@@ -248,6 +272,15 @@
                         modeButtonElement.classList.add('btn-success');
                         modeButtonElement.textContent = "돌고래 0단계";
                     }
+                    const urls = "http://172.20.10.6:5001/postdata"
+                    // const url = "http://172.20.10.2:5003/postdata";
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json' // JSON 데이터를 보내는 경우
+                        },
+                        body: JSON.stringify({o_order:changeValue})
+                    })
                     msg = modeSet(state, changeValue);
                     fetch('/manual', {
                         method: 'POST',

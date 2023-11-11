@@ -70,7 +70,6 @@ module.exports = (app,connection,crypto,query) =>{
                     cssfiles : "control",
                     ship: data[0],
                     connect : "정상",
-                    videoFeedUrl : "http://localhost:8080/video_feed"
                 });     
             }
         });
